@@ -1,0 +1,15 @@
+{
+  "name": "vitalesp-bot",
+  "version": "1.0.0",
+  "description": "Discord moderation bot for VitalEsports server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1"
+  },
+  "keywords": ["discord", "bot", "moderation", "esports"],
+  "author": "Your Name",
+  "license": "MIT"
+}
