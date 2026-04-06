@@ -50,6 +50,10 @@ const rest = new REST({ version: '10' }).setToken(token);
 
 client.once('clientReady', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  client.user.setPresence({
+    activities: [{ name: '/help | VitaL eSports', type: 3 }],
+    status: 'online'
+  });
 });
 
 client.on('interactionCreate', async interaction => {
