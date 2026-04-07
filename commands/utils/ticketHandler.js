@@ -273,8 +273,13 @@ async function reopenTicket(interaction) {
   ];
 
   const controlRow = buildControlRow(false);
-  if (interaction.message.editable) {
+  if (interaction.message && interaction.message.editable) {
     await interaction.message.edit({ embeds: [ticketEmbed], components: [controlRow] });
+  } else {
+    const botMessages = channel.messages.cache.filter(m => m.author.id === interaction.client.user.id && m.embeds.length);
+    if (botMessages.size) {
+      await botMessages.first().edit({ embeds: [ticketEmbed], components: [controlRow] });
+    }
   }
 
   const logChannel = await getOrCreateLogChannel(interaction.guild);
@@ -333,7 +338,11 @@ async function claimTicket(interaction) {
   }
 
   if (!interaction.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
-    return interaction.reply({ content: 'You need Manage Channels permission to claim this ticket.', flags: MessageFlags.Ephemeral });
+    const mentionRoleId = creds.ticketMentionRoleId;
+    const hasRole = mentionRoleId && interaction.member.roles.cache.has(mentionRoleId);
+    if (!hasRole) {
+      return interaction.reply({ content: 'You need Manage Channels permission or the configured support role to claim this ticket.', flags: MessageFlags.Ephemeral });
+    }
   }
 
   if (ticketInfo.claimedBy) {
@@ -352,8 +361,13 @@ async function claimTicket(interaction) {
   ];
 
   const updatedRow = buildControlRow(true);
-  if (interaction.message.editable) {
+  if (interaction.message && interaction.message.editable) {
     await interaction.message.edit({ embeds: [ticketEmbed], components: [updatedRow] });
+  } else {
+    const botMessages = channel.messages.cache.filter(m => m.author.id === interaction.client.user.id && m.embeds.length);
+    if (botMessages.size) {
+      await botMessages.first().edit({ embeds: [ticketEmbed], components: [updatedRow] });
+    }
   }
 
   const logChannel = await getOrCreateLogChannel(interaction.guild);
@@ -383,7 +397,8 @@ async function closeTicket(interaction) {
   }
 
   const isOwner = ticketInfo.ownerId === interaction.user.id;
-  if (!isOwner && !interaction.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
+  const canClose = isOwner || isTicketManager(interaction.member);
+  if (!canClose) {
     return interaction.reply({ content: 'You do not have permission to close this ticket.', flags: MessageFlags.Ephemeral });
   }
 
@@ -406,8 +421,13 @@ async function closeTicket(interaction) {
   ];
 
   const closeRow = buildClosedRow();
-  if (interaction.message.editable) {
+  if (interaction.message && interaction.message.editable) {
     await interaction.message.edit({ embeds: [ticketEmbed], components: [closeRow] });
+  } else {
+    const botMessages = channel.messages.cache.filter(m => m.author.id === interaction.client.user.id && m.embeds.length);
+    if (botMessages.size) {
+      await botMessages.first().edit({ embeds: [ticketEmbed], components: [closeRow] });
+    }
   }
 
   const logChannel = await getOrCreateLogChannel(interaction.guild);

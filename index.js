@@ -73,6 +73,14 @@ client.on('interactionCreate', async interaction => {
     return;
   }
 
+  if (interaction.isModalSubmit()) {
+    if (interaction.customId === 'embed_modal' || interaction.customId === 'embed_edit_modal') {
+      const embedBuilderHandler = require('./commands/utils/embedBuilderHandler');
+      await embedBuilderHandler.handleModalSubmit(interaction);
+    }
+    return;
+  }
+
   if (!interaction.isButton()) return;
 
   if (await ticketHandler.handleTicketButton(interaction)) return;
